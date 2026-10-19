@@ -1,0 +1,12 @@
+{
+  "mcpServers": {
+    "cloud-fuzzer": {
+      "command": "node",
+      "args": ["/absolute/path/Cloud-Fuzzer/mcp/stdio.mjs"],
+      "env": {
+        "CLOUD_FUZZER_URL": "https://cloud-fuzzer.YOUR_ACCOUNT.workers.dev",
+        "CLOUD_FUZZER_MCP_TOKEN": "SET_SECURELY_IN_YOUR_CLIENT"
+      }
+    }
+  }
+}

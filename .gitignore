@@ -1,0 +1,9 @@
+node_modules/
+.wrangler/
+.dev.vars
+.env
+*.log
+*.sqlite
+*.sqlite3
+.cloud-upload-state.json
+.DS_Store
