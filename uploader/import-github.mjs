@@ -38,7 +38,7 @@ export function parseOptions(args=[],env=process.env){
       }
     }
   }
-  if(!VALID_REPO.test(options.repo)||!VALID_BRANCH.test(options.branch)||options.branch.includes('..')||!VALID_RUN.test(options.runId))throw Error('Invalid GitHub repo, branch or run ID');
+  if(!VALID_REPO.test(options.repo)||options.repo.split('/').some(part=>part==='.'||part==='..')||!VALID_BRANCH.test(options.branch)||options.branch.includes('..')||!VALID_RUN.test(options.runId))throw Error('Invalid GitHub repo, branch or run ID');
   if(![1,2,3,4].includes(options.concurrency))throw Error('concurrency must be 1–4');
   options.endpoint=options.endpoint.replace(/\/+$/,'');
   if(!/^https:\/\/[a-z0-9.-]+(?::443)?$/i.test(options.endpoint))throw Error('CLOUD_FUZZER_URL must be an HTTPS origin');
