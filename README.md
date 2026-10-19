@@ -40,6 +40,43 @@ curl.exe https://cloud-fuzzer.YOUR_SUBDOMAIN.workers.dev/health
 
 Do not claim the deployment is active until this URL returns `{"ok":true,...}`.
 
+## Import existing screenshots directly from the old GitHub repository
+
+The import command reads **`Shisetsu-Code/Fuzzer-Manual`**, branch
+`catalog-snapshots`, run `pragmatic-20261019` directly over HTTPS. It sends
+the existing `shots/*.jpg`, `review/*.jpg`, and their `metadata/*.json` to
+the deployed Cloud-Fuzzer Worker (private R2 + D1), without copying the
+old Git history, rerunning any game, or changing the old repo.
+
+From Windows PowerShell, inside `Cloud-Fuzzer`:
+
+```powershell
+git pull --ff-only
+$env:CLOUD_FUZZER_URL = "https://cloud-fuzzer.braian-n-l.workers.dev"
+$env:CLOUD_FUZZER_INGEST_TOKEN = [System.Net.NetworkCredential]::new('', (Read-Host "INGEST_TOKEN" -AsSecureString)).Password
+node .\uploader\import-github.mjs --dry-run
+node .\uploader\import-github.mjs
+```
+
+- No new Worker deployment is needed; the importer is a local Node.js client.
+- `--dry-run` counts available screenshots without uploading them.
+- `--limit=5` tests five captures; `--concurrency=1..4` adjusts throughput.
+- Only screenshots with status `ready` or `review` are imported, including
+  screenshots stuck on INTRO (kept for manual classification).
+- The source Git SHA is pinned at the beginning so new GitHub commits cannot
+  mix different image versions within a run.
+- Progress is stored in `data/github-import-state.json`. Re-running resumes
+  without resending confirmed identical images. Duplicate captures already
+  present in D1 are idempotent; a different image for the same ID raises a
+  conflict and is **never** silently overwritten.
+- Failed uploads are printed as `ERROR <slug>` and retried on the next run.
+- Importing images does **not** automatically import classifications previously
+  saved in GitHub. Only JPEGs, metadata and pending queue entries are moved.
+
+To send **future local captures straight to Cloudflare**, separately run
+`uploader/upload.mjs --source="<Fuzzer-Manual local catalog path>" --watch`.
+That uploader follows your local `manifest.json` and bypasses GitHub entirely.
+
 ## Upload your already captured screenshots
 
 On your PC, while Fuzzer-Manual continues capturing with a maximum of 3 game starts/minute:
